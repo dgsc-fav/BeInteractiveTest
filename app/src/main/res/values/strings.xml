@@ -1,24 +1,26 @@
 <resources>
     <string name="app_name">BeInteractiveTest</string>
-    <string name="large_text">
-        "Material is the metaphor"
-    </string>
-
-
+    <!--permissions dialogs-->
     <string name="permission_location_denied">Access to location service is denied</string>
     <string name="dialog_location_permission_message">Please allow access to location service</string>
     <string name="about_location_permissions_info">Application must have permissions access to location</string>
-
-
+   <!--menu items-->
     <string name="action_cities">Cities</string>
     <string name="action_settings">Settings</string>
+    <!--weather activity error-->
     <string name="get_weather_error" formatted="false">Error during getting weather:\n%s</string>
     <string name="get_weather_empty_result">No weather data</string>
+    <!--weather activity captions-->
     <string name="weather_now">Weather now</string>
+    <!--weather activity table view-->
     <string name="morn">morn</string>
     <string name="day">day</string>
     <string name="eve">eve</string>
     <string name="night">night</string>
     <string name="n_a">N/A</string>
+    <string name="celsium_value" formatted="false">%.2f°</string>
+    <!--weather activity toasts-->
+    <string name="location_updated">Location is updated</string>
+    <string name="weather_updated">Weather is updated</string>
 
 </resources>

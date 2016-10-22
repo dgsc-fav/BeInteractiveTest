@@ -10,14 +10,12 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.Request;
@@ -32,14 +30,14 @@ import com.github.dgsc_fav.beinteractivetest.weather.api.Consts;
 import com.github.dgsc_fav.beinteractivetest.weather.api.model.CurrentWeather;
 import com.github.dgsc_fav.beinteractivetest.weather.api.model.DailyWeather;
 import com.github.dgsc_fav.beinteractivetest.weather.api.model.Temp;
-
 import retrofit2.Call;
 import retrofit2.Response;
 
 /**
  * Created by DG on 22.10.2016.
  */
-public class WeatherActivity extends AbstractPermissionsActivity implements LocationListener, WeatherProvider.WeatherCallback {
+public class WeatherActivity extends AbstractPermissionsActivity
+        implements LocationListener, WeatherProvider.WeatherCallback {
     private static final String TAG = WeatherActivity.class.getSimpleName();
 
     public static String EXTRA_LOCATION = "location";
@@ -119,7 +117,6 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
 
         // проверка наличия permissions
         checkLocationServicePermissions();
-
     }
 
     @Override
@@ -195,10 +192,9 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
     private void updateTitleByLocation() {
         if (mLocation != null) {
             Address address = LocationUtils.getAddress(this, mLocation);
-            Log.v(TAG, "address:" + address);
 
             String placeName = LocationUtils.getAddressString(address);
-            Log.v(TAG, "placeName:" + placeName);
+
             if (placeName != null) {
                 mPlaceName.setText(placeName);
             } else {
@@ -235,6 +231,8 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
         mLocation = location;
         updateTitleByLocation();
         updateWeatherByLocation();
+
+        Toast.makeText(this, getString(R.string.location_updated), Toast.LENGTH_SHORT).show();
     }
 
     private void updateWeatherByLocation() {
@@ -247,7 +245,8 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
     private void updateCurrentWeather(@Nullable CurrentWeather currentWeather) {
         if (currentWeather != null) {
             mWeatherDate.setText(TimeUtils.toIso(currentWeather.getDt() * 1000));
-            mWeatherNowValue.setText(String.valueOf(currentWeather.getMain().getTemp()));
+            mWeatherNowValue.setText(
+                    getString(R.string.celsium_value, currentWeather.getMain().getTemp()));
             String iconId = correctIconId(currentWeather.getWeather().get(0).getIcon());
             downloadIcon(iconId, mWeatherNowImage);
         } else {
@@ -257,15 +256,16 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
         }
 
         mRefreshWeather.setEnabled(true);
+        Toast.makeText(this, getString(R.string.weather_updated), Toast.LENGTH_SHORT).show();
     }
 
     private void updateDailyWeather(@Nullable DailyWeather dailyWeather) {
         if (dailyWeather != null) {
             Temp temp = dailyWeather.getList().get(0).getTemp();
-            mWeatherMornValue.setText(String.valueOf(temp.getMorn()));
-            mWeatherDayValue.setText(String.valueOf(temp.getDay()));
-            mWeatherEveValue.setText(String.valueOf(temp.getEve()));
-            mWeatherNightValue.setText(String.valueOf(temp.getNight()));
+            mWeatherMornValue.setText(getString(R.string.celsium_value, temp.getMorn()));
+            mWeatherDayValue.setText(getString(R.string.celsium_value, temp.getDay()));
+            mWeatherEveValue.setText(getString(R.string.celsium_value, temp.getEve()));
+            mWeatherNightValue.setText(getString(R.string.celsium_value, temp.getNight()));
         } else {
             mWeatherMornValue.setText(R.string.n_a);
             mWeatherDayValue.setText(R.string.n_a);
@@ -274,6 +274,7 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
         }
 
         mRefreshWeather.setEnabled(true);
+        Toast.makeText(this, getString(R.string.weather_updated), Toast.LENGTH_SHORT).show();
     }
 
     private void downloadIcon(String iconId, ImageView imageView) {
@@ -288,9 +289,6 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
 
     /**
      * https://openweathermap.org/weather-conditions
-     *
-     * @param iconId
-     * @return
      */
     private static String correctIconId(String iconId) {
         return "501".equals(iconId) ? "10d" : iconId;
@@ -315,11 +313,13 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
      * @see WeatherProvider#getCurrentWeather(Context, Location, WeatherProvider.WeatherCallback)
      */
     @Override
-    public void onCurrentWeatherResponse(Call<CurrentWeather> call, Response<CurrentWeather> response) {
+    public void onCurrentWeatherResponse(Call<CurrentWeather> call,
+            Response<CurrentWeather> response) {
         CurrentWeather currentWeather = response.body();
         updateCurrentWeather(currentWeather);
         if (currentWeather == null) {
-            Toast.makeText(this, getString(R.string.get_weather_empty_result), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.get_weather_empty_result), Toast.LENGTH_LONG)
+                    .show();
         }
     }
 
@@ -328,7 +328,8 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
      */
     @Override
     public void onCurrentWeatherFailure(Call<CurrentWeather> call, Throwable t) {
-        Toast.makeText(this, getString(R.string.get_weather_error, t.getLocalizedMessage()), Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getString(R.string.get_weather_error, t.getLocalizedMessage()),
+                Toast.LENGTH_LONG).show();
         updateCurrentWeather(null);
     }
 
@@ -340,7 +341,8 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
         DailyWeather dailyWeather = response.body();
         updateDailyWeather(dailyWeather);
         if (dailyWeather == null) {
-            Toast.makeText(this, getString(R.string.get_weather_empty_result), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.get_weather_empty_result), Toast.LENGTH_LONG)
+                    .show();
         }
     }
 
@@ -349,10 +351,10 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
      */
     @Override
     public void onDailyWeatherFailure(Call<DailyWeather> call, Throwable t) {
-        Toast.makeText(this, getString(R.string.get_weather_error, t.getLocalizedMessage()), Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getString(R.string.get_weather_error, t.getLocalizedMessage()),
+                Toast.LENGTH_LONG).show();
         updateDailyWeather(null);
     }
-
 
     private static class TextViewDrawableTarget implements Target<GlideDrawable> {
 
@@ -373,7 +375,8 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
         }
 
         @Override
-        public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+        public void onResourceReady(GlideDrawable resource,
+                GlideAnimation<? super GlideDrawable> glideAnimation) {
             mTextView.setCompoundDrawablesWithIntrinsicBounds(resource, null, null, null);
         }
 
@@ -412,5 +415,4 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
 
         }
     }
-
 }
