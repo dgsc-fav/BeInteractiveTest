@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="com.github.dgsc_fav.beinteractivetest.ui.activity.WeatherActivity">
+    <item
+        android:id="@+id/action_cities"
+        android:orderInCategory="100"
+        android:title="@string/action_cities"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="101"
+        android:title="@string/action_settings"
+        app:showAsAction="never"/>
+</menu>
