@@ -1,7 +1,14 @@
 <resources>
-    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="table_margin">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
     <dimen name="icon_margin">0dp</dimen>
     <dimen name="title_margin_bottom">32dp</dimen>
     <dimen name="title_margin_start">32dp</dimen>
+    <dimen name="weather_image_width">48dp</dimen>
+    <dimen name="weather_image_height">48dp</dimen>
+    <dimen name="weather_date_text_size">12sp</dimen>
+    <dimen name="weather_now_caption_text_size">14sp</dimen>
+    <dimen name="weather_now_text_size">18sp</dimen>
+    <dimen name="weather_daily_caption_text_size">12sp</dimen>
+    <dimen name="weather_daily_text_size">14sp</dimen>
 </resources>

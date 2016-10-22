@@ -1,7 +1,7 @@
 package com.github.dgsc_fav.beinteractivetest.weather.api;
 
-import com.github.dgsc_fav.beinteractivetest.weather.api.model.DailyWeather;
 import com.github.dgsc_fav.beinteractivetest.weather.api.model.CurrentWeather;
+import com.github.dgsc_fav.beinteractivetest.weather.api.model.DailyWeather;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

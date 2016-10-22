@@ -1,19 +1,20 @@
 
 package com.github.dgsc_fav.beinteractivetest.weather.api.model;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class CurrentWeather {
+import java.util.ArrayList;
+import java.util.List;
+
+public class CurrentWeather/* implements Weatherable*/ {
 
     @SerializedName("coord")
     @Expose
     private Coord coord;
     @SerializedName("weather")
     @Expose
-    private List<Weather> weather = new ArrayList<Weather>();
+    private List<Weather> weather = new ArrayList<>();
     @SerializedName("base")
     @Expose
     private String base;
