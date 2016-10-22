@@ -10,15 +10,28 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.dgsc_fav.beinteractivetest.R;
 import com.github.dgsc_fav.beinteractivetest.util.LocationUtils;
+import com.github.dgsc_fav.beinteractivetest.weather.WeatherService;
+import com.github.dgsc_fav.beinteractivetest.weather.api.model.DailyWeather;
+import com.github.dgsc_fav.beinteractivetest.weather.api.model.List;
 
-public class WeatherActivity extends AbstractPermissionsActivity implements LocationListener {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+/**
+ * Created by DG on 22.10.2016.
+ */
+public class WeatherActivity extends AbstractPermissionsActivity implements LocationListener, Callback<DailyWeather> {
     private static final String TAG = WeatherActivity.class.getSimpleName();
 
     public static String EXTRA_LOCATION = "location";
@@ -28,9 +41,12 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
 
     private LocationManager mLocationManager;
     private Location        mLocation;
-
+    private Toolbar toolbar;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private ImageView               mMyLocationMode;
+
+    TextView mPlaceName;
+    TextView textView;
 
     private boolean mIsLocationFixed;
 
@@ -39,7 +55,7 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
 
-        mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
+//        mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         mMyLocationMode = (ImageView) findViewById(R.id.image_mylocation_mode);
         mMyLocationMode.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,7 +67,7 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
             }
         });
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -61,6 +77,8 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
                 updateWeatherByLocation();
             }
         });
+        mPlaceName = (TextView) findViewById(R.id.place_name);
+        textView = (TextView) findViewById(R.id.text);
 
         if(savedInstanceState == null) {
             if(getIntent() != null && getIntent().getExtras() != null) {
@@ -80,6 +98,7 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
 
         // проверка наличия permissions
         checkLocationServicePermissions();
+
     }
 
     @Override
@@ -144,10 +163,12 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
 
     private void updateToolbarByLocation() {
         if(mIsLocationFixed) {
-            mCollapsingToolbarLayout.setBackgroundResource(R.color.fixLocationCity);
+            toolbar.setBackgroundResource(R.color.fixLocationCity);
+//            mCollapsingToolbarLayout.setBackgroundResource(R.color.fixLocationCity);
             mMyLocationMode.setVisibility(View.GONE);
         } else {
-            mCollapsingToolbarLayout.setBackgroundResource(R.color.useLocationCity);
+            toolbar.setBackgroundResource(R.color.useLocationCity);
+//            mCollapsingToolbarLayout.setBackgroundResource(R.color.useLocationCity);
             mMyLocationMode.setVisibility(View.VISIBLE);
         }
     }
@@ -155,12 +176,20 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
     private void updateTitleByLocation() {
         if(mLocation != null) {
             Address address = LocationUtils.getAddress(this, mLocation);
-            if(address != null) {
-                String city = address.getLocality();
-                setTitle(city);
+            Log.v(TAG, "address:" + address);
+
+            String placeName = LocationUtils.getAddressString(address);
+            Log.v(TAG, "placeName:" + placeName);
+            if(placeName != null) {
+                mPlaceName.setText(placeName);
+            } else {
+                mPlaceName.setText(mLocation.toString());
             }
+
         }
     }
+
+
 
     private void updateLocation() {
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -194,7 +223,7 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
 
     private void updateWeatherByLocation() {
         if(mLocation != null) {
-
+            //WeatherService.getDailyWeather(this, mLocation, this);
         }
     }
 
@@ -213,4 +242,33 @@ public class WeatherActivity extends AbstractPermissionsActivity implements Loca
 
     }
 
+    /**
+     * @see WeatherService#getDailyWeather(Context, Location, Callback)
+     */
+    @Override
+    public void onResponse(Call<DailyWeather> call, Response<DailyWeather> response) {
+
+
+        DailyWeather dailyWeather = response.body();
+        if(dailyWeather != null) {
+            List list = dailyWeather.getList().get(0);
+
+
+            textView.setText(String.valueOf(list.getTemp().getEve()));
+        } else {
+            Toast
+                    .makeText(this, getString(R.string.get_weather_empty_result), Toast.LENGTH_LONG)
+                    .show();
+        }
+    }
+
+    /**
+     * @see WeatherService#getDailyWeather(Context, Location, Callback)
+     */
+    @Override
+    public void onFailure(Call<DailyWeather> call, Throwable t) {
+        Toast.makeText(this,
+                       getString(R.string.get_weather_error, t.getLocalizedMessage()),
+                       Toast.LENGTH_LONG).show();
+    }
 }

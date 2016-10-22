@@ -32,28 +32,28 @@ public abstract class AbstractPermissionsActivity extends AppCompatActivity {
         if(ActivityCompat.checkSelfPermission(this,
                                               Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat
                                                                                                                                         .checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                                                                                                                                this,
+                                                                                                                                                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             if(ActivityCompat.shouldShowRequestPermissionRationale(this,
                                                                    Manifest.permission.ACCESS_FINE_LOCATION) || ActivityCompat
                                                                                                                         .shouldShowRequestPermissionRationale(
-                    this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                                                                                                                                this,
+                                                                                                                                Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 // Display UI and wait for user interaction
                 showDialog(R.string.dialog_location_permission_message,
                            new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            requestLocationPermission();
-                                        }
-                                    },
+                               @Override
+                               public void onClick(DialogInterface dialog, int which) {
+                                   requestLocationPermission();
+                               }
+                           },
                            new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            processWithPermissionsDenied();
-                                        }
-                                    });
+                               @Override
+                               public void onClick(DialogInterface dialog, int which) {
+                                   processWithPermissionsDenied();
+                               }
+                           });
             } else {
                 requestLocationPermission();
             }
@@ -97,11 +97,9 @@ public abstract class AbstractPermissionsActivity extends AppCompatActivity {
                 processWithPermissionsGranted();
             } else {
                 // прав нет. завершение работы
-                Toast
-                        .makeText(this,
-                                  getString(R.string.permission_location_denied),
-                                  Toast.LENGTH_SHORT)
-                        .show();
+                Toast.makeText(this,
+                               getString(R.string.permission_location_denied),
+                               Toast.LENGTH_SHORT).show();
 
                 processWithPermissionsDenied();
             }

@@ -29,4 +29,22 @@ public class LocationUtils {
         }
         return null;
     }
+
+    public static String getAddressString(Address address) {
+        if(address == null) {
+            return null;
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        int lineIndex = address.getMaxAddressLineIndex();
+//        if(lineIndex > 2) {
+//            lineIndex = 2;
+//        }
+        for(; lineIndex-- > 0;) {
+            stringBuilder.append(address.getAddressLine(lineIndex)).append(",");
+        }
+        return stringBuilder.toString();
+    }
+
+
 }

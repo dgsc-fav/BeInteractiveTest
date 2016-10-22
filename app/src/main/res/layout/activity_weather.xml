@@ -5,25 +5,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    android:fitsSystemWindows="false"
     tools:context="com.github.dgsc_fav.beinteractivetest.ui.activity.WeatherActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/app_bar_height"
-        android:fitsSystemWindows="true"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="false"
         android:theme="@style/AppTheme.AppBarOverlay">
 
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/toolbar_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fitsSystemWindows="true"
-            app:contentScrim="?attr/colorPrimary"
-            app:expandedTitleMarginBottom="@dimen/title_margin_bottom"
-            app:expandedTitleMarginStart="@dimen/title_margin_start"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+        <!--<android.support.design.widget.CollapsingToolbarLayout-->
+            <!--android:id="@+id/toolbar_layout"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:fitsSystemWindows="true"-->
+            <!--app:contentScrim="?attr/colorPrimary"-->
+            <!--app:expandedTitleMarginBottom="@dimen/title_margin_bottom"-->
+            <!--app:expandedTitleMarginStart="@dimen/title_margin_start"-->
+            <!--app:expandedTitleTextAppearance="@style/Title.Expanded"-->
+            <!--app:collapsedTitleTextAppearance="@style/Title.Collapsed"-->
+            <!--app:layout_scrollFlags="scroll|exitUntilCollapsed">-->
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -32,17 +34,10 @@
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/AppTheme.PopupOverlay">
 
-                <ImageView
-                    android:id="@+id/image_mylocation_mode"
-                    style="@android:style/Widget.Material.Toolbar.Button.Navigation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/icon_margin"
-                    android:contentDescription="my_location_mode"
-                    android:src="@android:drawable/ic_menu_mylocation"/>
+
             </android.support.v7.widget.Toolbar>
 
-        </android.support.design.widget.CollapsingToolbarLayout>
+        <!--</android.support.design.widget.CollapsingToolbarLayout>-->
 
 
     </android.support.design.widget.AppBarLayout>
