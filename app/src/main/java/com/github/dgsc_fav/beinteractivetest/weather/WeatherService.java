@@ -3,11 +3,13 @@ package com.github.dgsc_fav.beinteractivetest.weather;
 import android.content.Context;
 import android.location.Location;
 import android.support.annotation.NonNull;
+
 import com.github.dgsc_fav.beinteractivetest.R;
 import com.github.dgsc_fav.beinteractivetest.weather.api.Consts;
 import com.github.dgsc_fav.beinteractivetest.weather.api.OpenWeatherMapApi;
 import com.github.dgsc_fav.beinteractivetest.weather.api.model.CurrentWeather;
 import com.github.dgsc_fav.beinteractivetest.weather.api.model.DailyWeather;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;

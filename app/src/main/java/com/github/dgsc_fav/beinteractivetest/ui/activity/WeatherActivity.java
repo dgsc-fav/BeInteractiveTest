@@ -4,18 +4,26 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Criteria;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.Request;
@@ -23,19 +31,25 @@ import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.bumptech.glide.request.target.Target;
 import com.github.dgsc_fav.beinteractivetest.R;
+import com.github.dgsc_fav.beinteractivetest.provider.CitiesProvider;
 import com.github.dgsc_fav.beinteractivetest.provider.WeatherProvider;
 import com.github.dgsc_fav.beinteractivetest.util.LocationUtils;
 import com.github.dgsc_fav.beinteractivetest.util.TimeUtils;
 import com.github.dgsc_fav.beinteractivetest.weather.api.Consts;
+import com.github.dgsc_fav.beinteractivetest.weather.api.model.City;
 import com.github.dgsc_fav.beinteractivetest.weather.api.model.CurrentWeather;
 import com.github.dgsc_fav.beinteractivetest.weather.api.model.DailyWeather;
 import com.github.dgsc_fav.beinteractivetest.weather.api.model.Temp;
+
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Response;
 
 /**
  * Created by DG on 22.10.2016.
  */
+
 public class WeatherActivity extends AbstractPermissionsActivity
         implements LocationListener, WeatherProvider.WeatherCallback {
     private static final String TAG = WeatherActivity.class.getSimpleName();
@@ -59,6 +73,7 @@ public class WeatherActivity extends AbstractPermissionsActivity
     private TextView mWeatherDayValue;
     private TextView mWeatherEveValue;
     private TextView mWeatherNightValue;
+    TabLayout mTabLayout;
 
     // флаг, что локацию нельзя менять - жёстко установленныое расположение
     private boolean mIsLocationFixed;
@@ -67,6 +82,8 @@ public class WeatherActivity extends AbstractPermissionsActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
+
+        mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
 
         mRefreshLocation = (ImageView) findViewById(R.id.image_refresh_location);
         mRefreshLocation.setOnClickListener(new View.OnClickListener() {
@@ -112,6 +129,47 @@ public class WeatherActivity extends AbstractPermissionsActivity
             mLocation = savedInstanceState.getParcelable("mLocation");
             mIsLocationFixed = savedInstanceState.getBoolean("mIsLocationFixed");
         }
+
+
+        List<City> cityList = CitiesProvider.getInstanse(this).getCityList();
+        for (City city : cityList) {
+            TabLayout.Tab tab = mTabLayout.newTab();
+            tab.setText(city.getName());
+            tab.setTag(city);
+            mTabLayout.addTab(tab);
+        }
+
+        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                animationBeforeSetValue();
+
+                if (tab.getPosition() == 0) {
+                    mIsLocationFixed = false;
+                    updateLocation();
+                } else {
+                    mIsLocationFixed = true;
+                    City city = (City) tab.getTag();
+                    mLocation = new Location("");
+                    mLocation.setLatitude(city.getCoord().getLat());
+                    mLocation.setLongitude(city.getCoord().getLon());
+                }
+
+                updateToolbarByLocation();
+                updateTitleByLocation();
+                updateWeatherByLocation();
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
 
         updateToolbarByLocation();
 
@@ -191,15 +249,8 @@ public class WeatherActivity extends AbstractPermissionsActivity
 
     private void updateTitleByLocation() {
         if (mLocation != null) {
-            Address address = LocationUtils.getAddress(this, mLocation);
-
-            String placeName = LocationUtils.getAddressString(address);
-
-            if (placeName != null) {
-                mPlaceName.setText(placeName);
-            } else {
-                mPlaceName.setText(mLocation.toString());
-            }
+            GeocoderHandler geocoderHandler = new GeocoderHandler(mPlaceName);
+            LocationUtils.getAddress(this, mLocation, geocoderHandler);
         }
     }
 
@@ -354,6 +405,86 @@ public class WeatherActivity extends AbstractPermissionsActivity
         Toast.makeText(this, getString(R.string.get_weather_error, t.getLocalizedMessage()),
                 Toast.LENGTH_LONG).show();
         updateDailyWeather(null);
+    }
+
+    private void animationBeforeSetValue() {
+        // todo потом класс отдельный hideValue(mPlaceName);
+    }
+
+    private void animationAfterSetValue() {
+        // todo потом класс отдельный showValue(mPlaceName);
+    }
+
+
+    private void hideValue(View view) {
+        ViewPropertyAnimatorCompat viewpropertyanimator = (ViewPropertyAnimatorCompat) view.getTag(
+                R.id.animation);
+        if (viewpropertyanimator != null) {
+            viewpropertyanimator.cancel();
+        } else {
+            viewpropertyanimator = ViewCompat.animate(view);
+            view.setTag(R.id.animation, viewpropertyanimator);
+        }
+
+        float f = 0.0F;
+
+
+        viewpropertyanimator.alpha(f).setDuration(10L).start();
+    }
+
+    private void showValue(View view) {
+        ViewPropertyAnimatorCompat viewpropertyanimator = (ViewPropertyAnimatorCompat) view.getTag(
+                R.id.animation);
+        if (viewpropertyanimator != null) {
+            viewpropertyanimator.cancel();
+        } else {
+            viewpropertyanimator = ViewCompat.animate(view);
+            view.setTag(R.id.animation, viewpropertyanimator);
+        }
+
+        float f = 1.0F;
+
+        viewpropertyanimator.alpha(f).setDuration(500L).start();
+    }
+
+    /**
+     * Обрабатывает ответ от {@link Geocoder}
+     * {@link LocationUtils#getAddress(Context, Location, Handler)}
+     */
+    private static class GeocoderHandler extends Handler {
+        TextView mTextView;
+
+        GeocoderHandler(TextView textView) {
+            mTextView = textView;
+        }
+
+        @Override
+        public void handleMessage(Message message) {
+
+            Bundle bundle = message.getData();
+
+            Address address;
+            Location location = bundle.getParcelable(LocationUtils.KEY_LOCATION);
+
+            switch (message.what) {
+                case LocationUtils.WHAT_SUCCESS:
+                    address = bundle.getParcelable(LocationUtils.KEY_SUCCESS_RESULT);
+                    break;
+                default:
+                    address = null;
+                    break;
+            }
+
+            Log.v(TAG, "address:" + address);
+            String placeName = LocationUtils.getAddressString(address);
+
+            if (placeName != null) {
+                mTextView.setText(placeName);
+            } else {
+                mTextView.setText(String.valueOf(location));
+            }
+            //animationAfterSetValue();
+        }
     }
 
     private static class TextViewDrawableTarget implements Target<GlideDrawable> {

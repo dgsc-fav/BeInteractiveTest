@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.github.dgsc_fav.beinteractivetest.ui.activity.WeatherActivity"
     tools:showIn="@layout/activity_weather">
@@ -38,7 +38,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_toLeftOf="@+id/image_refresh_weather"
                 android:layout_toRightOf="@id/image_refresh_location"
-                android:gravity="center_vertical"
+                android:gravity="center"
                 android:maxLines="2"
                 android:padding="@dimen/text_margin"
                 tools:text="place_name" />

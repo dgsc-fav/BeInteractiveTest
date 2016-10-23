@@ -45,6 +45,6 @@
         </ADDITIONAL_INDENT_OPTIONS>
       </value>
     </option>
-    <option name="PREFERRED_PROJECT_CODE_STYLE" value="ProlificAndroid" />
+    <option name="PREFERRED_PROJECT_CODE_STYLE" value="AndroidStyle" />
   </component>
 </project>
