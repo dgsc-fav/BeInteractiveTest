@@ -130,15 +130,6 @@ public class WeatherActivity extends AbstractPermissionsActivity
             mIsLocationFixed = savedInstanceState.getBoolean("mIsLocationFixed");
         }
 
-
-        List<City> cityList = CitiesProvider.getInstanse(this).getCityList();
-        for (City city : cityList) {
-            TabLayout.Tab tab = mTabLayout.newTab();
-            tab.setText(city.getName());
-            tab.setTag(city);
-            mTabLayout.addTab(tab);
-        }
-
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -175,6 +166,15 @@ public class WeatherActivity extends AbstractPermissionsActivity
 
         // проверка наличия permissions
         checkLocationServicePermissions();
+    }
+
+    private void fillTabs(List<City> cities) {
+        for (City city : cities) {
+            TabLayout.Tab tab = mTabLayout.newTab();
+            tab.setText(city.getName());
+            tab.setTag(city);
+            mTabLayout.addTab(tab);
+        }
     }
 
     @Override
@@ -217,13 +217,32 @@ public class WeatherActivity extends AbstractPermissionsActivity
     @Override
     public void processWithPermissionsGranted() {
         // права даны.
-        if (!mIsLocationFixed) {
-            // если не фиксированная локация, то обновим через LOCATION_SERVICE
-            updateLocation();
-        } else {
-            // обновляем UI по заданному mLocation
-            onLocationChanged(mLocation);
-        }
+        // запрос городов из db
+        CitiesProvider.getCities(new CitiesProvider.CitiesProviderCallback() {
+            @Override
+            public void onComplete(final List<City> cities) {
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        fillTabs(cities);
+
+                        if (!mIsLocationFixed) {
+                            // если не фиксированная локация, то обновим через LOCATION_SERVICE
+                            updateLocation();
+                        } else {
+                            // обновляем UI по заданному mLocation
+                            onLocationChanged(mLocation);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure() {
+
+            }
+        });
     }
 
     @Override

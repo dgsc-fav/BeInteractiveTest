@@ -25,6 +25,11 @@
         </activity>
         <activity android:name=".ui.activity.CityActivity">
         </activity>
+
+        <provider
+            android:name=".provider.DbContentProvider"
+            android:authorities="com.github.dgsc_fav.beinteractivetest.provider.db_content_provider"
+            android:exported="false" />
     </application>
 
 </manifest>
