@@ -16,6 +16,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -73,10 +74,12 @@ public class WeatherActivity extends AbstractPermissionsActivity
     private TextView mWeatherDayValue;
     private TextView mWeatherEveValue;
     private TextView mWeatherNightValue;
-    TabLayout mTabLayout;
+    private TabLayout mTabLayout;
 
     // флаг, что локацию нельзя менять - жёстко установленныое расположение
     private boolean mIsLocationFixed;
+    private int mSelectedTabPosition;
+    private boolean mSelfSet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +123,7 @@ public class WeatherActivity extends AbstractPermissionsActivity
             if (getIntent() != null && getIntent().getExtras() != null) {
                 mLocation = getIntent().getExtras().getParcelable(EXTRA_LOCATION);
                 if (mLocation != null) {
-                    // если зауск activity с установленным местоположением,
+                    // если запуск activity с установленным местоположением,
                     // то не используем LOCATION_SERVICE
                     mIsLocationFixed = true;
                 }
@@ -128,14 +131,22 @@ public class WeatherActivity extends AbstractPermissionsActivity
         } else {
             mLocation = savedInstanceState.getParcelable("mLocation");
             mIsLocationFixed = savedInstanceState.getBoolean("mIsLocationFixed");
+            mSelectedTabPosition = savedInstanceState.getInt("mSelectedTabPosition");
         }
 
+        mSelfSet = true;
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                if(mSelfSet) {
+                    return;
+                }
+
                 animationBeforeSetValue();
 
-                if (tab.getPosition() == 0) {
+                mSelectedTabPosition = tab.getPosition();
+
+                if (mSelectedTabPosition == 0) {
                     mIsLocationFixed = false;
                     updateLocation();
                 } else {
@@ -175,6 +186,35 @@ public class WeatherActivity extends AbstractPermissionsActivity
             tab.setTag(city);
             mTabLayout.addTab(tab);
         }
+
+        // http://stackoverflow.com/a/32844200 Mario Velasco's code
+        mTabLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                int tabLayoutWidth = mTabLayout.getWidth();
+
+                DisplayMetrics metrics = new DisplayMetrics();
+                WeatherActivity.this.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+                int deviceWidth = metrics.widthPixels;
+
+                if (tabLayoutWidth < deviceWidth) {
+                    mTabLayout.setTabMode(TabLayout.MODE_FIXED);
+                    mTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+                } else {
+                    mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+                }
+
+                TabLayout.Tab tab;
+                if ((tab = mTabLayout.getTabAt(mSelectedTabPosition)) != null) {
+                    mSelfSet = true;
+                    tab.select();
+
+                }
+
+                // теперь можно
+                mSelfSet = false;
+            }
+        });
     }
 
     @Override
@@ -203,6 +243,7 @@ public class WeatherActivity extends AbstractPermissionsActivity
         super.onSaveInstanceState(outState);
         outState.putParcelable("mLocation", mLocation);
         outState.putBoolean("mIsLocationFixed", mIsLocationFixed);
+        outState.putInt("mSelectedTabPosition", mSelectedTabPosition);
     }
 
     @Override
@@ -349,7 +390,12 @@ public class WeatherActivity extends AbstractPermissionsActivity
 
     private void downloadIcon(String iconId, ImageView imageView) {
         String url = String.format(Consts.API_ICON_URL, iconId);
-        Glide.with(this).load(url).into(imageView);
+        try {
+            Glide.with(this).load(url).into(imageView);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // а если крутануть экран во время загрузки)
+        }
     }
 
     private void downloadIcon(String iconId, TextView textView) {
