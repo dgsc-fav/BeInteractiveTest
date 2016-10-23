@@ -447,6 +447,7 @@ public class WeatherActivity extends AbstractPermissionsActivity
         viewpropertyanimator.alpha(f).setDuration(500L).start();
     }
 
+    // TODO: 23.10.2016 проследить, что с context. (???textView.getHandler())
     /**
      * Обрабатывает ответ от {@link Geocoder}
      * {@link LocationUtils#getAddress(Context, Location, Handler)}
@@ -456,6 +457,7 @@ public class WeatherActivity extends AbstractPermissionsActivity
 
         GeocoderHandler(TextView textView) {
             mTextView = textView;
+
         }
 
         @Override
