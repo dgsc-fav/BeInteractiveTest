@@ -17,7 +17,6 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -546,7 +545,6 @@ public class WeatherActivity extends AbstractPermissionsActivity
                     break;
             }
 
-            Log.v(TAG, "address:" + address);
             String placeName = LocationUtils.getAddressString(address);
 
             if (placeName != null) {
