@@ -1,7 +1,6 @@
 package com.github.dgsc_fav.beinteractivetest.ui.activity;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -25,11 +24,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.Request;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SizeReadyCallback;
-import com.bumptech.glide.request.target.Target;
 import com.github.dgsc_fav.beinteractivetest.R;
 import com.github.dgsc_fav.beinteractivetest.provider.CitiesProvider;
 import com.github.dgsc_fav.beinteractivetest.provider.WeatherProvider;
@@ -395,11 +389,6 @@ public class WeatherActivity extends AbstractPermissionsActivity
         }
     }
 
-    private void downloadIcon(String iconId, TextView textView) {
-        String url = String.format(Consts.API_ICON_URL, iconId);
-        Glide.with(this).load(url).into(new TextViewDrawableTarget(textView));
-    }
-
     /**
      * https://openweathermap.org/weather-conditions
      */
@@ -553,66 +542,6 @@ public class WeatherActivity extends AbstractPermissionsActivity
                 mTextView.setText(String.valueOf(location));
             }
             //animationAfterSetValue();
-        }
-    }
-
-    private static class TextViewDrawableTarget implements Target<GlideDrawable> {
-
-        private TextView mTextView;
-
-        TextViewDrawableTarget(TextView textView) {
-            mTextView = textView;
-        }
-
-        @Override
-        public void onLoadStarted(Drawable placeholder) {
-            mTextView.setCompoundDrawablesWithIntrinsicBounds(placeholder, null, null, null);
-        }
-
-        @Override
-        public void onLoadFailed(Exception e, Drawable errorDrawable) {
-            mTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
-        }
-
-        @Override
-        public void onResourceReady(GlideDrawable resource,
-                GlideAnimation<? super GlideDrawable> glideAnimation) {
-            mTextView.setCompoundDrawablesWithIntrinsicBounds(resource, null, null, null);
-        }
-
-        @Override
-        public void onLoadCleared(Drawable placeholder) {
-
-        }
-
-        @Override
-        public void getSize(SizeReadyCallback cb) {
-
-        }
-
-        @Override
-        public void setRequest(Request request) {
-
-        }
-
-        @Override
-        public Request getRequest() {
-            return null;
-        }
-
-        @Override
-        public void onStart() {
-
-        }
-
-        @Override
-        public void onStop() {
-
-        }
-
-        @Override
-        public void onDestroy() {
-
         }
     }
 }
