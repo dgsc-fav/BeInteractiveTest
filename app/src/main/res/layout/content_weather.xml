@@ -4,16 +4,226 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.github.dgsc_fav.beinteractivetest.ui.activity.WeatherActivity"
-    tools:showIn="@layout/activity_weather">
+    tools:showIn="@layout/activity_weather"
+    >
 
-    <TextView
-        android:id="@+id/text"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:text="@string/large_text"/>
+        android:orientation="vertical"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/weather_header_height"
+            android:orientation="horizontal"
+            >
+
+            <ImageView
+                android:id="@+id/image_refresh_location"
+                style="@style/Widget.AppCompat.Toolbar.Button.Navigation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:layout_marginLeft="@dimen/icon_margin"
+                android:layout_marginRight="@dimen/icon_margin"
+                android:contentDescription="@null"
+                android:src="@android:drawable/ic_menu_mylocation"
+                />
+
+            <TextView
+                android:id="@+id/place_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center_vertical"
+                android:layout_toLeftOf="@+id/image_refresh_weather"
+                android:layout_toRightOf="@id/image_refresh_location"
+                android:gravity="center"
+                android:maxLines="2"
+                tools:text="place_name"
+                />
+
+            <ImageView
+                android:id="@+id/image_refresh_weather"
+                style="@style/Widget.AppCompat.Toolbar.Button.Navigation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:layout_marginLeft="@dimen/icon_margin"
+                android:layout_marginRight="@dimen/icon_margin"
+                android:contentDescription="@null"
+                android:src="@android:drawable/ic_menu_rotate"
+                />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/text_margin"
+                android:text="@string/weather_now"
+                android:textSize="@dimen/weather_now_caption_text_size"
+                />
+
+            <TextView
+                android:id="@+id/weather_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/text_margin"
+                android:text="@string/n_a"
+                android:textColor="?android:textColorTertiaryInverse"
+                android:textSize="@dimen/weather_date_text_size"
+                />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            >
+
+            <ImageView
+                android:id="@+id/weather_now_image"
+                android:layout_width="@dimen/weather_image_width"
+                android:layout_height="@dimen/weather_image_height"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                tools:src="@android:drawable/picture_frame"
+                />
+
+            <TextView
+                android:id="@+id/weather_now_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/text_margin"
+                android:text="@string/n_a"
+                android:textSize="@dimen/weather_now_text_size"
+                />
+
+        </LinearLayout>
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="@dimen/table_margin"
+            android:paddingRight="@dimen/table_margin"
+            >
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingBottom="@dimen/table_margin"
+                android:paddingTop="@dimen/table_margin"
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/morn"
+                    android:textSize="@dimen/weather_daily_caption_text_size"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/day"
+                    android:textSize="@dimen/weather_daily_caption_text_size"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/eve"
+                    android:textSize="@dimen/weather_daily_caption_text_size"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/night"
+                    android:textSize="@dimen/weather_daily_caption_text_size"
+                    />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingBottom="@dimen/table_margin"
+                android:paddingTop="@dimen/table_margin"
+                >
+
+                <TextView
+                    android:id="@+id/weather_morn_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/n_a"
+                    android:textSize="@dimen/weather_daily_text_size"
+                    />
+
+                <TextView
+                    android:id="@+id/weather_day_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/n_a"
+                    android:textSize="@dimen/weather_daily_text_size"
+                    />
+
+                <TextView
+                    android:id="@+id/weather_eve_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/n_a"
+                    android:textSize="@dimen/weather_daily_text_size"
+                    />
+
+                <TextView
+                    android:id="@+id/weather_night_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/n_a"
+                    android:textSize="@dimen/weather_daily_text_size"
+                    />
+
+            </TableRow>
+        </TableLayout>
+
+
+    </LinearLayout>
+
 
 </android.support.v4.widget.NestedScrollView>

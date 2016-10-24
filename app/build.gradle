@@ -21,14 +21,20 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:design:24.2.1'
-
-
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.pushtorefresh.storio:sqlite:1.11.0'
+    compile 'com.pushtorefresh.storio:content-resolver:1.11.0'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     testCompile 'junit:junit:4.12'
+    compile 'com.pushtorefresh.storio:sqlite-annotations:1.11.0'
+    compile 'com.pushtorefresh.storio:sqlite-annotations-processor:1.11.0'
+    compile 'com.pushtorefresh.storio:content-resolver-annotations:1.11.0'
+    compile 'com.pushtorefresh.storio:content-resolver-annotations-processor:1.11.0'
 }
