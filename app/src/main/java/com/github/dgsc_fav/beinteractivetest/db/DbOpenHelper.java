@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 
 import com.github.dgsc_fav.beinteractivetest.db.table.CitiesTable;
+import com.github.dgsc_fav.beinteractivetest.db.table.CurrentWeatherTable;
+import com.github.dgsc_fav.beinteractivetest.db.table.DailyWeatherTable;
 
 /**
  * Created by DG on 23.10.2016.
@@ -13,7 +15,7 @@ import com.github.dgsc_fav.beinteractivetest.db.table.CitiesTable;
 
 public class DbOpenHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "weather.sqlite";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 5;
 
     public DbOpenHelper(@NonNull Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -22,10 +24,12 @@ public class DbOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(@NonNull SQLiteDatabase db) {
         db.execSQL(CitiesTable.getCreateTableQuery());
+        db.execSQL(CurrentWeatherTable.getCreateTableQuery());
+        db.execSQL(DailyWeatherTable.getCreateTableQuery());
     }
 
     @Override
     public void onUpgrade(@NonNull SQLiteDatabase db, int oldVersion, int newVersion) {
-        // no impl
+        onCreate(db);
     }
 }

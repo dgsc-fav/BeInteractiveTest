@@ -80,6 +80,4 @@ public class LocationUtils {
         //return address.getAddressLine(0) + ", " + address.getLocality();
         return stringBuilder.toString();
     }
-
-
 }

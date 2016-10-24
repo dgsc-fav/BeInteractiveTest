@@ -44,9 +44,6 @@ import com.github.dgsc_fav.beinteractivetest.weather.api.model.Temp;
 
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Response;
-
 /**
  * Created by DG on 22.10.2016.
  */
@@ -57,8 +54,8 @@ public class WeatherActivity extends AbstractPermissionsActivity
 
     public static String EXTRA_LOCATION = "location";
 
-    private static final long MINIMUM_DISTANCE_FOR_UPDATES = 10;   // 5km
-    private static final long MINIMUM_TIME_BETWEEN_UPDATES = 2000; // 30m
+    private static final long MINIMUM_DISTANCE_FOR_UPDATES = 1000;      // 1km
+    private static final long MINIMUM_TIME_BETWEEN_UPDATES = 10 * 1000; // 10m
 
     private LocationManager mLocationManager;
     private Location mLocation;
@@ -103,7 +100,8 @@ public class WeatherActivity extends AbstractPermissionsActivity
             @Override
             public void onClick(View v) {
                 mRefreshWeather.setEnabled(false);
-                updateWeatherByLocation();
+                // запрашиваем погоду с обязательным обновлением с сервера
+                updateWeatherByLocation(true);
             }
         });
 
@@ -138,7 +136,7 @@ public class WeatherActivity extends AbstractPermissionsActivity
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if(mSelfSet) {
+                if (mSelfSet) {
                     return;
                 }
 
@@ -159,7 +157,7 @@ public class WeatherActivity extends AbstractPermissionsActivity
 
                 updateToolbarByLocation();
                 updateTitleByLocation();
-                updateWeatherByLocation();
+                updateWeatherByLocation(false);
             }
 
             @Override
@@ -261,7 +259,7 @@ public class WeatherActivity extends AbstractPermissionsActivity
         // запрос городов из db
         CitiesProvider.getCities(new CitiesProvider.CitiesProviderCallback() {
             @Override
-            public void onComplete(final List<City> cities) {
+            public void onResponse(final List<City> cities) {
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -339,17 +337,19 @@ public class WeatherActivity extends AbstractPermissionsActivity
 
     @Override
     public void onLocationChanged(Location location) {
+        // к чёрту лишняя информация
+//        if(mLocation == null || mLocation.distanceTo(location) > MINIMUM_DISTANCE_FOR_UPDATES) {
+//            Toast.makeText(this, getString(R.string.location_updated), Toast.LENGTH_SHORT).show();
+//        }
         mLocation = location;
         updateTitleByLocation();
-        updateWeatherByLocation();
-
-        Toast.makeText(this, getString(R.string.location_updated), Toast.LENGTH_SHORT).show();
+        updateWeatherByLocation(false);
     }
 
-    private void updateWeatherByLocation() {
+    private void updateWeatherByLocation(boolean needUpdate) {
         if (mLocation != null) {
-            WeatherProvider.getCurrentWeather(this, mLocation, this);
-            WeatherProvider.getDailyWeather(this, mLocation, this);
+            WeatherProvider.getCurrentWeather(this, mLocation, needUpdate, !mIsLocationFixed, this);
+            WeatherProvider.getDailyWeather(this, mLocation, needUpdate, !mIsLocationFixed, this);
         }
     }
 
@@ -367,7 +367,6 @@ public class WeatherActivity extends AbstractPermissionsActivity
         }
 
         mRefreshWeather.setEnabled(true);
-        Toast.makeText(this, getString(R.string.weather_updated), Toast.LENGTH_SHORT).show();
     }
 
     private void updateDailyWeather(@Nullable DailyWeather dailyWeather) {
@@ -385,7 +384,6 @@ public class WeatherActivity extends AbstractPermissionsActivity
         }
 
         mRefreshWeather.setEnabled(true);
-        Toast.makeText(this, getString(R.string.weather_updated), Toast.LENGTH_SHORT).show();
     }
 
     private void downloadIcon(String iconId, ImageView imageView) {
@@ -425,48 +423,53 @@ public class WeatherActivity extends AbstractPermissionsActivity
 
     }
 
-    /**
-     * @see WeatherProvider#getCurrentWeather(Context, Location, WeatherProvider.WeatherCallback)
-     */
     @Override
-    public void onCurrentWeatherResponse(Call<CurrentWeather> call,
-            Response<CurrentWeather> response) {
-        CurrentWeather currentWeather = response.body();
-        updateCurrentWeather(currentWeather);
-        if (currentWeather == null) {
-            Toast.makeText(this, getString(R.string.get_weather_empty_result), Toast.LENGTH_LONG)
-                    .show();
-        }
+    public void onCurrentWeatherResponse(final CurrentWeather currentWeather,
+            final boolean fromServer) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                updateCurrentWeather(currentWeather);
+                if (currentWeather == null) {
+                    Toast.makeText(WeatherActivity.this,
+                            getString(R.string.get_weather_empty_result),
+                            Toast.LENGTH_LONG).show();
+                } else if (fromServer) {
+                    Toast.makeText(WeatherActivity.this, getString(R.string.weather_updated),
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
 
-    /**
-     * @see WeatherProvider#getCurrentWeather(Context, Location, WeatherProvider.WeatherCallback)
-     */
     @Override
-    public void onCurrentWeatherFailure(Call<CurrentWeather> call, Throwable t) {
+    public void onCurrentWeatherFailure(Throwable t) {
         Toast.makeText(this, getString(R.string.get_weather_error, t.getLocalizedMessage()),
                 Toast.LENGTH_LONG).show();
         updateCurrentWeather(null);
     }
 
-    /**
-     * @see WeatherProvider#getDailyWeather(Context, Location, WeatherProvider.WeatherCallback)
-     */
     @Override
-    public void onDailyWeatherResponse(Call<DailyWeather> call, Response<DailyWeather> response) {
-        DailyWeather dailyWeather = response.body();
-        updateDailyWeather(dailyWeather);
-        if (dailyWeather == null) {
-            Toast.makeText(this, getString(R.string.get_weather_empty_result), Toast.LENGTH_LONG)
-                    .show();
-        }
+    public void onDailyWeatherResponse(final DailyWeather dailyWeather, final boolean fromServer) {
+        runOnUiThread(new Runnable() {
+            public void run() {
+                updateDailyWeather(dailyWeather);
+                if (dailyWeather == null) {
+                    Toast.makeText(WeatherActivity.this,
+                            getString(R.string.get_weather_empty_result),
+                            Toast.LENGTH_LONG).show();
+                } else if (fromServer) {
+                    Toast.makeText(WeatherActivity.this, getString(R.string.weather_updated),
+                            Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
     }
 
-    /**
-     * @see WeatherProvider#getDailyWeather(Context, Location, WeatherProvider.WeatherCallback)
-     */
     @Override
-    public void onDailyWeatherFailure(Call<DailyWeather> call, Throwable t) {
+    public void onDailyWeatherFailure(Throwable t) {
         Toast.makeText(this, getString(R.string.get_weather_error, t.getLocalizedMessage()),
                 Toast.LENGTH_LONG).show();
         updateDailyWeather(null);
@@ -513,6 +516,7 @@ public class WeatherActivity extends AbstractPermissionsActivity
     }
 
     // TODO: 23.10.2016 проследить, что с context. (???textView.getHandler())
+
     /**
      * Обрабатывает ответ от {@link Geocoder}
      * {@link LocationUtils#getAddress(Context, Location, Handler)}

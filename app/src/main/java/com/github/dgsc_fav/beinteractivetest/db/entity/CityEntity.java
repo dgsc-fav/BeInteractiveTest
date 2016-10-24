@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.github.dgsc_fav.beinteractivetest.db.table.CitiesTable;
-import com.github.dgsc_fav.beinteractivetest.provider.CitiesMeta;
+import com.github.dgsc_fav.beinteractivetest.provider.meta.CitiesMeta;
 import com.pushtorefresh.storio.contentresolver.annotations.StorIOContentResolverColumn;
 import com.pushtorefresh.storio.contentresolver.annotations.StorIOContentResolverType;
 import com.pushtorefresh.storio.sqlite.annotations.StorIOSQLiteColumn;
@@ -66,12 +66,18 @@ public class CityEntity {
     // Check our tests, we have examples!
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         CityEntity cityEntity = (CityEntity) o;
 
-        if (id != null ? !id.equals(cityEntity.id) : cityEntity.id != null) return false;
+        if (id != null ? !id.equals(cityEntity.id) : cityEntity.id != null) {
+            return false;
+        }
         return this.city.equals(cityEntity.city);
     }
 

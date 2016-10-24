@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class CitiesProvider {
 
     public interface CitiesProviderCallback {
-        void onComplete(List<City> cities);
+        void onResponse(List<City> cities);
 
         void onFailure();
     }
@@ -35,9 +35,10 @@ public class CitiesProvider {
     private static final String TAG = CitiesProvider.class.getSimpleName();
     // пусть будет с одним тредом
     private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+    // предполагалось, что не будет отдавать данные, пока sIsInited == false
     private static final AtomicBoolean sIsInited = new AtomicBoolean();
     // assert DbContentProvider будет создан при старте приложения
-    private static final StorIOSQLite storIOSQLite = DbContentProvider.getStorIOSQLite();
+    private static final StorIOSQLite IOSQ_LITE = DbContentProvider.getStorIOSQLite();
 
     /**
      * Инициализация
@@ -77,7 +78,7 @@ public class CitiesProvider {
         EXECUTOR.execute(new Runnable() {
             @Override
             public void run() {
-                citiesProviderCallback.onComplete(fromBeanToWeather(getImpl()));
+                citiesProviderCallback.onResponse(fromBeanToWeather(getImpl()));
             }
         });
     }
@@ -87,7 +88,7 @@ public class CitiesProvider {
         EXECUTOR.execute(new Runnable() {
             @Override
             public void run() {
-                citiesProviderCallback.onComplete(fromBeanToWeather(getImpl(cityId)));
+                citiesProviderCallback.onResponse(fromBeanToWeather(getImpl(cityId)));
             }
         });
     }
@@ -99,7 +100,7 @@ public class CitiesProvider {
             public void run() {
                 putImpl(fromWeatherToBean(Collections.singletonList(city)));
                 // TODO: 23.10.2016 возвращать из результата
-                citiesProviderCallback.onComplete(null);
+                citiesProviderCallback.onResponse(null);
             }
         });
     }
@@ -111,7 +112,7 @@ public class CitiesProvider {
             public void run() {
                 deleteImpl(fromWeatherToBean(Collections.singletonList(city)).get(0));
                 // TODO: 23.10.2016 возвращать из результата
-                citiesProviderCallback.onComplete(null);
+                citiesProviderCallback.onResponse(null);
             }
         });
     }
@@ -141,10 +142,10 @@ public class CitiesProvider {
         putImpl(cityEntities);
     }
 
-
+    // посмотреть CitiesMeta
     @NonNull
     private static List<CityEntity> getImpl() {
-        return storIOSQLite
+        return IOSQ_LITE
                 .get()
                 .listOfObjects(CityEntity.class)
                 .withQuery(CitiesTable.QUERY_ALL)
@@ -154,7 +155,7 @@ public class CitiesProvider {
 
     @NonNull
     private static List<CityEntity> getImpl(long id) {
-        return storIOSQLite
+        return IOSQ_LITE
                 .get()
                 .listOfObjects(CityEntity.class)
                 .withQuery(Query.builder()
@@ -168,7 +169,7 @@ public class CitiesProvider {
 
     @NonNull
     private static PutResults<CityEntity> putImpl(List<CityEntity> cityEntities) {
-        return storIOSQLite
+        return IOSQ_LITE
                 .put()
                 .objects(cityEntities)
                 .prepare()
@@ -177,7 +178,7 @@ public class CitiesProvider {
 
     @NonNull
     private static DeleteResult deleteImpl(CityEntity cityEntity) {
-        return storIOSQLite
+        return IOSQ_LITE
                 .delete()
                 .byQuery(DeleteQuery.builder()
                         .table(CitiesTable.TABLE)

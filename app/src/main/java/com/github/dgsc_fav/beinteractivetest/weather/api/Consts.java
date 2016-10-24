@@ -11,7 +11,9 @@ public interface Consts {
      * @see OpenWeatherMapApi#getDailyWeather(double, double, String, String)
      */
     String API_BASE_URL = "http://api.openweathermap.org/";
-
+    /**
+     * Адрес исконок
+     */
     String API_ICON_URL = "http://openweathermap.org/img/w/%s.png";
 
     /**

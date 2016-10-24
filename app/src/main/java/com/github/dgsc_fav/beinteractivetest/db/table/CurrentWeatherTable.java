@@ -5,26 +5,26 @@ import android.support.annotation.NonNull;
 import com.pushtorefresh.storio.sqlite.queries.Query;
 
 /**
- * Хранит объект типа {@link com.github.dgsc_fav.beinteractivetest.weather.api.model.City}
- * под маской {@link com.github.dgsc_fav.beinteractivetest.db.entity.CityEntity}
+ * Хранит объект типа {@link com.github.dgsc_fav.beinteractivetest.weather.api.model.CurrentWeather}
+ * под маской {@link com.github.dgsc_fav.beinteractivetest.db.entity.CurrentWeatherEntity}
  * Для простоты объект хранится в серилизованном виде
  * В данном случае, в формате Json
  *
  * Created by DG on 23.10.2016.
  */
 
-public class CitiesTable {
+public class CurrentWeatherTable {
     @NonNull
-    public static final String TABLE = "cities";
+    public static final String TABLE = "c_weather";
 
     @NonNull
     public static final String COLUMN_ID = "_id";
-
     @NonNull
-    public static final String COLUMN_CITY = "city";
-
-    public static final String COLUMN_ID_WITH_TABLE_PREFIX = TABLE + "." + COLUMN_ID;
-    public static final String COLUMN_CITY_WITH_TABLE_PREFIX = TABLE + "." + COLUMN_CITY;
+    public static final String COLUMN_TIMESTAMP = "timestamp";
+    @NonNull
+    public static final String COLUMN_CACHE_KEY = "cacheKey";
+    @NonNull
+    public static final String COLUMN_CONTENT = "content";
 
     // Yep, with StorIO you can safely store queries as objects and reuse them, they are immutable
     @NonNull
@@ -33,7 +33,7 @@ public class CitiesTable {
             .build();
 
     // This is just class with Meta Data, we don't need instances
-    private CitiesTable() {
+    private CurrentWeatherTable() {
         throw new IllegalStateException("No instances please");
     }
 
@@ -41,7 +41,9 @@ public class CitiesTable {
     public static String getCreateTableQuery() {
         return "CREATE TABLE IF NOT EXISTS " + TABLE + "("
                 + COLUMN_ID + " INTEGER NOT NULL PRIMARY KEY, "
-                + COLUMN_CITY + " TEXT NOT NULL"
+                + COLUMN_TIMESTAMP + " INTEGER NOT NULL, "
+                + COLUMN_CACHE_KEY + " TEXT NOT NULL UNIQUE, "
+                + COLUMN_CONTENT + " TEXT NOT NULL"
                 + ");";
     }
 }
