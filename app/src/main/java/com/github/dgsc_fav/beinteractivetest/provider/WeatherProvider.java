@@ -23,7 +23,6 @@ import com.pushtorefresh.storio.sqlite.operations.put.PutResult;
 import com.pushtorefresh.storio.sqlite.queries.DeleteQuery;
 import com.pushtorefresh.storio.sqlite.queries.Query;
 
-import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -56,6 +55,10 @@ public class WeatherProvider {
         // stub
     }
 
+    // погода для моей локации вынесена из базы
+    private static CurrentWeatherEntity sMyPlaceCurrentWeatherEntity;
+    private static DailyWeatherEntity sMyPlaceDailyWeatherEntity;
+
     /**
      * Запрашивает в базе или с сервера текущую погоду по location
      *
@@ -73,8 +76,9 @@ public class WeatherProvider {
             EXECUTOR.execute(new Runnable() {
                 @Override
                 public void run() {
-                    // проверка наличия в базе
-                    CurrentWeatherEntity currentWeatherEntity = getCurrentWeatherImpl(cacheKey);
+                    // проверка наличия в базе или в статич поле,если моя локация
+                    CurrentWeatherEntity currentWeatherEntity =
+                            ignorePersist ? sMyPlaceCurrentWeatherEntity : getCurrentWeatherImpl(cacheKey);
 
                     if (needUpdate) {
                         // обязательно с сервера
@@ -92,12 +96,8 @@ public class WeatherProvider {
                         getCurrentWeatherFromServer(context, location, ignorePersist,
                                 currentWeatherCallback);
                     } else {
-                        if (ignorePersist) {
-
-                        } else {
-                            currentWeatherCallback.onCurrentWeatherResponse(
-                                    fromBeanToWeather(currentWeatherEntity), false);
-                        }
+                        currentWeatherCallback.onCurrentWeatherResponse(
+                                fromBeanToWeather(currentWeatherEntity), false);
                     }
                 }
             });
@@ -123,8 +123,9 @@ public class WeatherProvider {
             EXECUTOR.execute(new Runnable() {
                 @Override
                 public void run() {
-                    // проверка наличия в базе
-                    DailyWeatherEntity dailyWeatherEntity = getDailyWeatherImpl(cacheKey);
+                    // проверка наличия в базе или в статич поле,если моя локация
+                    DailyWeatherEntity dailyWeatherEntity =
+                            ignorePersist ? sMyPlaceDailyWeatherEntity : getDailyWeatherImpl(cacheKey);
 
                     if (needUpdate) {
                         // обязательно с сервера
@@ -142,12 +143,8 @@ public class WeatherProvider {
                         getDailyWeatherFromServer(context, location, ignorePersist,
                                 dailyWeatherCallback);
                     } else {
-                        if (ignorePersist) {
-
-                        } else {
-                            dailyWeatherCallback.onDailyWeatherResponse(
-                                    fromBeanToWeather(dailyWeatherEntity), false);
-                        }
+                        dailyWeatherCallback.onDailyWeatherResponse(
+                                fromBeanToWeather(dailyWeatherEntity), false);
                     }
                 }
             });
@@ -162,7 +159,11 @@ public class WeatherProvider {
         WeatherService.getCurrentWeather(context, location, new Callback<CurrentWeather>() {
             @Override
             public void onResponse(Call<CurrentWeather> call, Response<CurrentWeather> response) {
-                putCurrentWeather(location, response.body());
+                if(ignorePersist) {
+                    sMyPlaceCurrentWeatherEntity = fromWeatherToBean(location, response.body());
+                } else {
+                    putCurrentWeather(location, response.body());
+                }
                 currentWeatherCallback.onCurrentWeatherResponse(response.body(), true);
             }
 
@@ -174,12 +175,16 @@ public class WeatherProvider {
     }
 
     private static void getDailyWeatherFromServer(@NonNull Context context,
-            final Location location, boolean ignorePersist,
+            final Location location, final boolean ignorePersist,
             @NonNull final WeatherCallback dailyWeatherCallback) {
         WeatherService.getDailyWeather(context, location, new Callback<DailyWeather>() {
             @Override
             public void onResponse(Call<DailyWeather> call, Response<DailyWeather> response) {
-                putDailyWeather(location, response.body());
+                if (ignorePersist) {
+                    sMyPlaceDailyWeatherEntity = fromWeatherToBean(location, response.body());
+                } else {
+                    putDailyWeather(location, response.body());
+                }
                 dailyWeatherCallback.onDailyWeatherResponse(response.body(), true);
             }
 
